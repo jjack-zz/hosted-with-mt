@@ -1,0 +1,93 @@
+<html>
+<head>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+<script>window.jQuery||document.write('<script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.7.1.min.js">\x3C/script>');</script>
+<script>window.jQuery||document.write('<script src="http://code.jquery.com/jquery-1.7.1.min.js">\x3C/script>');</script>
+<script>
+$(document).ready(function() {
+
+    // from: http://whois.arin.net/rest/org/MEDIAT-10/nets.json
+    var mt_ranges = new Array(
+        {
+            'first':'1087340544', // 64.207.128.0
+            'last': '1087356927', // 64.207.191.255
+        },
+        {
+            'first':'1208623104', // 72.10.32.0
+            'last': '1208631295', // 72.10.63.255
+        },
+        {
+            'first':'3451551744', // 205.186.128.0
+            'last': '3451568127', // 205.186.191.255
+        },
+        {
+            'first':'3628482560', // 216.70.64.0
+            'last': '3628498943', // 216.70.127.255
+        },
+        {
+            'first':'1074642944', // 64.13.192.0
+            'last': '1074659327', // 64.13.255.255
+        },
+        {
+            'first':'1211088896', // 72.47.192.0
+            'last': '1211105279', // 72.47.255.255
+        },
+        {
+            'first':'1176518656', // 70.32.64.0
+            'last': '1176535039', // 70.32.127.255
+        }
+    );
+
+    function is_mt_ip(ip) {
+        var dec_ip = ip_to_dec(ip);
+
+        var mt_ip = false;
+        $.each(mt_ranges, function(index, range) {
+           if ( dec_ip >= range.first && dec_ip <= range.last ) {
+               mt_ip = true;
+               return false;
+           }
+        });
+
+        return mt_ip;
+    }
+
+    // convert the ip to a number for easy comparing
+    function ip_to_dec(ip) {
+        var address = ip.split('.');
+
+        return (address[0] * (256*256*256)) + (address[1] * (256*256)) + (address[2] * 256) + address[3];
+    }
+
+    function update_icon(url, tabId) {
+        var domain = url.match(/^.+:\/\/([^\/]+)/)[1];
+        $.ajax({
+            url: 'http://rocketscientry.com:16098/' + domain,
+            dataType: 'json',
+            success: function(data) {
+                //console.log( data.code + ' ' + is_mt_ip( data.code ) );
+
+                // data.code will come back something like ENOTFOUND with a bad/invalid domain
+                if ( !data.code.match(/^[a-z]+$/i) && is_mt_ip( data.code ) ) {
+                    chrome.pageAction.show( tabId );
+                }
+            },
+        });
+    }
+
+    chrome.webRequest.onHeadersReceived.addListener( function(details) {
+        //console.log('received headers');
+
+        update_icon( details.url, details.tabId );
+        return { cancel: false };
+    },
+    {
+        urls: ["<all_urls>"],
+        types: ["main_frame"]
+    },
+        ["blocking"]
+    );
+});
+</script>
+</head>
+</html>

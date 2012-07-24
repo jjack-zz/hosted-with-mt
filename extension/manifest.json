@@ -1,0 +1,21 @@
+{
+    "name": "Hosted With (mt) Media Temple",
+    "version": "0.1.3",
+    "description": "Shows whether or not you're browsing a site that's hosted on (mt)",
+    "background_page": "background.html",
+    "update_url": "http://rocketscientry.com/chrome/update.xml",
+    "page_action" : {
+        "default_icon" : "mt-icon.png",
+        "default_title" : "Hosted With (mt) Media Temple"
+    },
+    "permissions": [
+        "tabs",
+        "<all_urls>",
+        "webRequest",
+        "webRequestBlocking"
+    ],
+    "icons": {
+        "48":"mt-48.png",
+        "128":"mt-128.png"
+    }
+}
